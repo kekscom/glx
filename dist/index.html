@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>GLX Test</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="DragDrop.js"></script>
+  <!--<script src="glx.debug.js"></script>-->
+  <script src="../src/index.js"></script>
+  <script src="../src/util.js"></script>
+  <script src="../src/Buffer.js"></script>
+  <script src="../src/Framebuffer.js"></script>
+  <script src="../src/Shader.js"></script>
+  <script src="../src/Matrix.js"></script>
+  <script src="../src/Texture.js"></script>
+  <script src="../src/mesh/index.js"></script>
+  <script src="../src/mesh/Triangle.js"></script>
+  <script src="../src/mesh/Plane.js"></script>
+  <script src="../src/mesh/Cube.js"></script>
+  <style>
+  #label {
+    position:absolute;
+    z-Index:1000;
+    border:1px solid #999999;
+    background:rgba(255,255,255,0.8);
+    padding:5px;
+    font-family:sans-serif;
+    border-radius:2px;
+    box-shadow:0 0 15px rgba(0,0,0,0.5);
+  }
+  </style>
+  <script type="application/x-vertex-shader">
+  precision highp float;
+
+  attribute vec4 aPosition;
+  attribute vec4 aColor;
+
+  uniform mat4 uMatrix;
+  varying vec4 vColor;
+
+  void main() {
+    gl_Position = uMatrix * aPosition;
+    vColor = aColor;
+  }
+  </script>
+  <script type="application/x-fragment-shader">
+  precision highp float;
+
+  varying vec4 vColor;
+
+  void main() {
+    gl_FragColor = vColor;
+  }
+  </script>
+</head>
+
+<body>
+
+<div id="label">LABEL</div>
+
+<script>
+var WIDTH  = 800;
+var HEIGHT = 600;
+var GL = new glx.View(document.body, WIDTH, HEIGHT);
+
+//*****************************************************************************
+
+var x = 0;
+var y = 0;
+var rotation = 0;
+var tilt = 0;
+
+//*****************************************************************************
+
+var tile = new glx.mesh.Plane(256, [250/255, 240/255, 230/255, 1]);
+
+var building = new glx.mesh.Cube(20, [0.8, 0.8, 0.8, 1]);
+building.transform.scale(1, 1, 5);
+building.transform.translate(0, 0, 50);
+
+var check = new glx.mesh.Cube(1, [1, 0, 0, 1]);
+check.transform.translate(0, 0, 150);
+
+//*****************************************************************************
+
+var shader = new glx.Shader({
+  vertexShader: document.querySelector('[type="application/x-vertex-shader"]').innerText,
+  fragmentShader: document.querySelector('[type="application/x-fragment-shader"]').innerText,
+  attributes: ['aPosition', 'aColor'],
+  uniforms: ['uMatrix']
+});
+
+//*****************************************************************************
+
+// var pMatrix = new glx.Matrix();
+// pMatrix.translate(0, -1, 0);
+var pMatrix = new glx.Matrix.Perspective(45, WIDTH / HEIGHT, 0.1, 1000);
+
+var dragdrop = new DragDrop(document);
+dragdrop.on('drag', function(e) {
+  x -= e.dx;
+  y -= e.dy;
+  rotation -= e.dx;
+  tilt -= e.dy;
+});
+
+glx.start(function() {
+  shader.enable();
+
+  var vMatrix = new glx.Matrix();
+  vMatrix.translate(50, 50, 0);
+  vMatrix.rotateZ(rotation)
+  vMatrix.rotateX(-tilt)
+  vMatrix.translate(0, 0, -300);
+
+  var vp = glx.Matrix.multiply(vMatrix, pMatrix);
+
+  GL.clear(GL.COLOR_BUFFER_BIT | GL.DEPTH_BUFFER_BIT);
+
+
+  var mvp = glx.Matrix.multiply(tile.transform, { data:vp });
+  GL.uniformMatrix4fv(shader.uniforms.uMatrix, false, mvp);
+
+  tile.vertexBuffer.enable();
+  GL.vertexAttribPointer(shader.attributes.aPosition, tile.vertexBuffer.itemSize, GL.FLOAT, false, 0, 0);
+  // tile.normalBuffer.enable();
+  // GL.vertexAttribPointer(shader.attributes.aNormal, tile.normalBuffer.itemSize, GL.FLOAT, false, 0, 0);
+  tile.colorBuffer.enable();
+  GL.vertexAttribPointer(shader.attributes.aColor, tile.colorBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+  GL.drawArrays(GL.TRIANGLES, 0, tile.vertexBuffer.numItems);
+
+
+
+  var mvp = glx.Matrix.multiply(building.transform, { data:vp });
+  GL.uniformMatrix4fv(shader.uniforms.uMatrix, false, mvp);
+
+  building.vertexBuffer.enable();
+  GL.vertexAttribPointer(shader.attributes.aPosition, building.vertexBuffer.itemSize, GL.FLOAT, false, 0, 0);
+  // building.normalBuffer.enable();
+  // GL.vertexAttribPointer(shader.attributes.aNormal, building.normalBuffer.itemSize, GL.FLOAT, false, 0, 0);
+  building.colorBuffer.enable();
+  GL.vertexAttribPointer(shader.attributes.aColor, building.colorBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+  GL.drawArrays(GL.TRIANGLES, 0, building.vertexBuffer.numItems);
+
+
+
+  var mvp = glx.Matrix.multiply(check.transform, { data:vp });
+  GL.uniformMatrix4fv(shader.uniforms.uMatrix, false, mvp);
+
+  check.vertexBuffer.enable();
+  GL.vertexAttribPointer(shader.attributes.aPosition, check.vertexBuffer.itemSize, GL.FLOAT, false, 0, 0);
+  // check.normalBuffer.enable();
+  // GL.vertexAttribPointer(shader.attributes.aNormal, check.normalBuffer.itemSize, GL.FLOAT, false, 0, 0);
+  check.colorBuffer.enable();
+  GL.vertexAttribPointer(shader.attributes.aColor, check.colorBuffer.itemSize, GL.FLOAT, false, 0, 0);
+
+  GL.drawArrays(GL.TRIANGLES, 0, check.vertexBuffer.numItems);
+
+  shader.disable();
+
+
+
+  var mvp = glx.Matrix.multiply(check.transform, { data:vp });
+  var pos = glx.Matrix.transform(mvp);
+
+  var label = document.getElementById('label');
+  label.style.left = (pos.x*WIDTH) + 'px';
+  label.style.top = (HEIGHT-pos.y*HEIGHT) + 'px';
+});
+</script>
+</body>
+</html>

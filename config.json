@@ -1,0 +1,41 @@
+{
+  "shaders": {
+    "interaction": {
+      "attributes": ["aPosition", "aColor", "aHidden"],
+      "uniforms": ["uMatrix"],
+      "framebuffer": true
+    },
+    "depth": {
+      "attributes": ["aPosition", "aHidden"],
+      "uniforms": ["uMatrix"],
+      "framebuffer": true
+    },
+    "textured": {
+      "attributes": ["aPosition", "aTexCoord"],
+      "uniforms": ["uMatrix", "uTileImage"]
+    },
+    "buildings": {
+      "attributes": ["aPosition", "aColor", "aNormal", "aHidden"],
+      "uniforms": ["uMatrix", "uNormalTransform", "uAlpha", "uLightColor", "uLightDirection"]
+    }
+  },
+
+  "src": [
+    "src/index.js",
+    "src/util.js",
+    "src/Buffer.js",
+    "src/Framebuffer.js",
+    "src/Shader.js",
+    "src/Matrix.js",
+    "src/Texture.js",
+
+    "src/texture/index.js",
+    "src/texture/Image.js",
+    "src/texture/Data.js",
+
+    "src/mesh/index.js",
+    "src/mesh/Triangle.js",
+    "src/mesh/Plane.js",
+    "src/mesh/Cube.js"
+  ]
+}
