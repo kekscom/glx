@@ -1,6 +1,7 @@
 {
   "src": [
     "src/index.js",
+    "src/prefix.js",
     "src/util.js",
     "src/Buffer.js",
     "src/Framebuffer.js",
@@ -15,6 +16,7 @@
     "src/mesh/index.js",
     "src/mesh/Triangle.js",
     "src/mesh/Plane.js",
-    "src/mesh/Cube.js"
+    "src/mesh/Cube.js",
+    "src/suffix.js"
   ]
 }

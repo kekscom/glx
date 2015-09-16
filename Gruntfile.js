@@ -2,15 +2,15 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
-    product: 'glx',
+    product: 'GLX',
 
     pkg: grunt.file.readJSON('package.json'),
 
     concat: {
       options: {
         separator: '\n',
-        banner: "var glx = (function(global) {",
-        footer: '\nreturn glx;\n}(this));'
+        banner: '',
+        footer: ''
       },
       dist: {
         src: grunt.file.readJSON('config.json').src,
@@ -36,7 +36,7 @@ module.exports = function(grunt) {
            Map: true
          }
        },
-      all: grunt.file.readJSON('config.json').src
+      all: 'dist/<%=product%>.debug.js'
     }
   });
 

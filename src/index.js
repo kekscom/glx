@@ -1,10 +1,8 @@
 
-var glx = {};
+//var ext = GL.getExtension('WEBGL_lose_context');
+//ext.loseContext();
 
-var GL;
-
-glx.View = function(container, width, height) {
-
+var GLX = function(container, width, height) {
   var canvas = document.createElement('CANVAS');
   canvas.style.position = 'absolute';
   canvas.width = width;
@@ -17,15 +15,17 @@ glx.View = function(container, width, height) {
     premultipliedAlpha: false
   };
 
+  var context;
+
   try {
-    GL = canvas.getContext('webgl', options);
+    context = canvas.getContext('webgl', options);
   } catch (ex) {}
-  if (!GL) {
+  if (!context) {
     try {
-      GL = canvas.getContext('experimental-webgl', options);
+      context = canvas.getContext('experimental-webgl', options);
     } catch (ex) {}
   }
-  if (!GL) {
+  if (!context) {
     throw new Error('WebGL not supported');
   }
 
@@ -37,39 +37,11 @@ glx.View = function(container, width, height) {
     console.warn('context restored');
   });
 
-  //var ext = GL.getExtension("WEBGL_lose_context");
-  //ext.loseContext();
+  context.viewport(0, 0, width, height);
+  context.cullFace(context.BACK);
+  context.enable(context.CULL_FACE);
+  context.enable(context.DEPTH_TEST);
+  context.clearColor(0.5, 0.5, 0.5, 1);
 
-  GL.viewport(0, 0, width, height);
-  GL.cullFace(GL.BACK);
-  GL.enable(GL.CULL_FACE);
-  GL.enable(GL.DEPTH_TEST);
-  GL.clearColor(0.5, 0.5, 0.5, 1);
-
-  return GL;
+  return GLX.use(context);
 };
-
-glx.start = function(render) {
-  return setInterval(function() {
-    requestAnimationFrame(render);
-  }, 17);
-};
-
-glx.stop = function(loop) {
-  clearInterval(loop);
-};
-
-glx.destroy = function(GL) {
-  GL.canvas.parentNode.removeChild(GL.canvas);
-  GL.canvas = null;
-};
-
-//*****************************************************************************
-
-if (typeof define === 'function') {
-  define([], glx);
-} else if (typeof exports === 'object') {
-  module.exports = glx;
-} else {
-  global.glx = glx;
-}
