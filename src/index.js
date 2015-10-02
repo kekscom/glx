@@ -43,5 +43,11 @@ var GLX = function(container, width, height) {
   context.enable(context.DEPTH_TEST);
   context.clearColor(0.5, 0.5, 0.5, 1);
 
+  context.anisotropyExtension = context.getExtension("EXT_texture_filter_anisotropic");
+  if (context.anisotropyExtension) {
+    context.anisotropyExtension.maxAnisotropyLevel = context.getParameter( 
+      context.anisotropyExtension.MAX_TEXTURE_MAX_ANISOTROPY_EXT);
+  }
+
   return GLX.use(context);
 };
