@@ -45,8 +45,11 @@ glx.texture.Image = function(src, callback) {
       GL.generateMipmap(GL.TEXTURE_2D);
     
       if (GL.anisotropyExtension) {
-         GL.texParameterf(GL.TEXTURE_2D, GL.anisotropyExtension.TEXTURE_MAX_ANISOTROPY_EXT,
-                                         GL.anisotropyExtension.maxAnisotropyLevel);
+        GL.texParameterf(
+          GL.TEXTURE_2D,
+          GL.anisotropyExtension.TEXTURE_MAX_ANISOTROPY_EXT,
+          GL.anisotropyExtension.maxAnisotropyLevel
+        );
       }
       GL.bindTexture(GL.TEXTURE_2D, null);
     }
