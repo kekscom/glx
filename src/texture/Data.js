@@ -38,5 +38,6 @@ glx.texture.Data.prototype = {
   destroy: function() {
     GL.bindTexture(GL.TEXTURE_2D, null);
     GL.deleteTexture(this.id);
+    this.id = null;
   }
 };

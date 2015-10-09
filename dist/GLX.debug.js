@@ -133,6 +133,7 @@ glx.Buffer.prototype = {
 
   destroy: function() {
     GL.deleteBuffer(this.id);
+    this.id = null;
   }
 };
 
@@ -278,7 +279,10 @@ glx.Shader.prototype = {
     this.uniforms = null;
   },
   
-  destroy: function() {}
+  destroy: function() {
+    this.disable();
+    this.id = null;
+  }
 };
 
 
@@ -653,7 +657,7 @@ glx.texture.Image.prototype = {
   },
 
   destroy: function() {
-    GL.bindTexture(GL.TEXTURE_2D, null);
+    this.disable();
     GL.deleteTexture(this.id);
     this.id = null;
   }
@@ -699,6 +703,7 @@ glx.texture.Data.prototype = {
   destroy: function() {
     GL.bindTexture(GL.TEXTURE_2D, null);
     GL.deleteTexture(this.id);
+    this.id = null;
   }
 };
 

@@ -81,5 +81,8 @@ glx.Shader.prototype = {
     this.uniforms = null;
   },
   
-  destroy: function() {}
+  destroy: function() {
+    this.disable();
+    this.id = null;
+  }
 };

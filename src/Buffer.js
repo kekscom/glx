@@ -15,5 +15,6 @@ glx.Buffer.prototype = {
 
   destroy: function() {
     GL.deleteBuffer(this.id);
+    this.id = null;
   }
 };

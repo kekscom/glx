@@ -84,7 +84,7 @@ glx.texture.Image.prototype = {
   },
 
   destroy: function() {
-    GL.bindTexture(GL.TEXTURE_2D, null);
+    this.disable();
     GL.deleteTexture(this.id);
     this.id = null;
   }
