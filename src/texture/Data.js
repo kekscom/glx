@@ -1,5 +1,5 @@
 
-glx.texture.Data = function(size, data, options) {
+glx.texture.Data = function(width, height, data, options) {
   //options = options || {};
 
   this.id = GL.createTexture();
@@ -15,12 +15,12 @@ glx.texture.Data = function(size, data, options) {
   var bytes = null;
 
   if (data) {
-    var length = size*size*4;
+    var length = width*height*4;
     bytes = new Uint8Array(length);
     bytes.set(data.subarray(0, length));
   }
 
-  GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, size, size, 0, GL.RGBA, GL.UNSIGNED_BYTE, bytes);
+  GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, bytes);
   GL.bindTexture(GL.TEXTURE_2D, null);
 };
 
