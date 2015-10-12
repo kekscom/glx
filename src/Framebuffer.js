@@ -9,19 +9,24 @@ glx.Framebuffer.prototype = {
     this.frameBuffer = GL.createFramebuffer();
     GL.bindFramebuffer(GL.FRAMEBUFFER, this.frameBuffer);
 
+    width = glx.util.nextPowerOf2(width);
+    height= glx.util.nextPowerOf2(height);
+    
+    if (width === this.width && height === this.height) //already has the right size
+      return;
+    
     this.width  = width;
     this.height = height;
-    var size = glx.util.nextPowerOf2(Math.max(this.width, this.height));
 
     this.renderBuffer = GL.createRenderbuffer();
     GL.bindRenderbuffer(GL.RENDERBUFFER, this.renderBuffer);
-    GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, size, size);
+    GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);
 
     if (this.renderTexture) {
       this.renderTexture.destroy();
     }
 
-    this.renderTexture = new glx.texture.Data(size);
+    this.renderTexture = new glx.texture.Data(width, height);
 
     GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, this.renderBuffer);
     GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, this.renderTexture.id, 0);
