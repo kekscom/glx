@@ -12,9 +12,11 @@ glx.Framebuffer.prototype = {
     width = glx.util.nextPowerOf2(width);
     height= glx.util.nextPowerOf2(height);
     
-    if (width === this.width && height === this.height) //already has the right size
+    // already has the right size
+    if (width === this.width && height === this.height) {
       return;
-    
+    }
+
     this.width  = width;
     this.height = height;
 

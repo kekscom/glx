@@ -1,5 +1,5 @@
 {
-  "name": "glx",
+  "name": "GLX",
   "private": false,
   "description": "A WebGL base framework.",
   "version": "0.1.0",

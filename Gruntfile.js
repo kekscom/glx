@@ -2,8 +2,6 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
-    product: 'GLX',
-
     pkg: grunt.file.readJSON('package.json'),
 
     concat: {
@@ -14,20 +12,20 @@ module.exports = function(grunt) {
       },
       dist: {
         src: grunt.file.readJSON('config.json').src,
-        dest:  'dist/<%=product%>.debug.js'
+        dest:  'dist/<%=pkg.name%>.debug.js'
       }
     },
 
     uglify: {
       options: {},
       build: {
-        src: 'dist/<%=product%>.debug.js',
-        dest: 'dist/<%=product%>.js'
+        src: 'dist/<%=pkg.name%>.debug.js',
+        dest: 'dist/<%=pkg.name%>.js'
       }
     },
 
     clean: {
-      dist: ['./dist/<%=product%>.pack.js']
+      dist: ['./dist/<%=pkg.name%>.pack.js']
     },
 
     jshint: {
@@ -36,7 +34,7 @@ module.exports = function(grunt) {
            Map: true
          }
        },
-      all: 'dist/<%=product%>.debug.js'
+      all: 'dist/<%=pkg.name%>.debug.js'
     }
   });
 

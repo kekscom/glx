@@ -148,19 +148,26 @@ glx.Framebuffer.prototype = {
     this.frameBuffer = GL.createFramebuffer();
     GL.bindFramebuffer(GL.FRAMEBUFFER, this.frameBuffer);
 
+    width = glx.util.nextPowerOf2(width);
+    height= glx.util.nextPowerOf2(height);
+    
+    // already has the right size
+    if (width === this.width && height === this.height) {
+      return;
+    }
+
     this.width  = width;
     this.height = height;
-    var size = glx.util.nextPowerOf2(Math.max(this.width, this.height));
 
     this.renderBuffer = GL.createRenderbuffer();
     GL.bindRenderbuffer(GL.RENDERBUFFER, this.renderBuffer);
-    GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, size, size);
+    GL.renderbufferStorage(GL.RENDERBUFFER, GL.DEPTH_COMPONENT16, width, height);
 
     if (this.renderTexture) {
       this.renderTexture.destroy();
     }
 
-    this.renderTexture = new glx.texture.Data(size);
+    this.renderTexture = new glx.texture.Data(width, height);
 
     GL.framebufferRenderbuffer(GL.FRAMEBUFFER, GL.DEPTH_ATTACHMENT, GL.RENDERBUFFER, this.renderBuffer);
     GL.framebufferTexture2D(GL.FRAMEBUFFER, GL.COLOR_ATTACHMENT0, GL.TEXTURE_2D, this.renderTexture.id, 0);
@@ -664,7 +671,7 @@ glx.texture.Image.prototype = {
 };
 
 
-glx.texture.Data = function(size, data, options) {
+glx.texture.Data = function(width, height, data, options) {
   //options = options || {};
 
   this.id = GL.createTexture();
@@ -680,12 +687,12 @@ glx.texture.Data = function(size, data, options) {
   var bytes = null;
 
   if (data) {
-    var length = size*size*4;
+    var length = width*height*4;
     bytes = new Uint8Array(length);
     bytes.set(data.subarray(0, length));
   }
 
-  GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, size, size, 0, GL.RGBA, GL.UNSIGNED_BYTE, bytes);
+  GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, width, height, 0, GL.RGBA, GL.UNSIGNED_BYTE, bytes);
   GL.bindTexture(GL.TEXTURE_2D, null);
 };
 
