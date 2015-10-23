@@ -11,11 +11,29 @@ glx.texture.Image = function(src, callback) {
   GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, true);
   GL.bindTexture(GL.TEXTURE_2D, null);
 
-  var image = new Image();
+  if (typeof src !== 'string') {
+    this.onLoad(src);
+  } else {
+    var image = new Image();
+    image.crossOrigin = '*';
+    image.onload = function() {
+      this.onLoad(image);
+      if (callback) {
+        callback(image);
+      }
+    }.bind(this);
+    image.onerror = function() {
+      if (callback) {
+        callback();
+      }
+    };
+    image.src = src;
+  }
+};
 
-  image.crossOrigin = '*';
+glx.texture.Image.prototype = {
 
-  image.onload = function() {
+  onLoad: function(image) {
     // TODO: do this only once
     var maxTexSize = GL.getParameter(GL.MAX_TEXTURE_SIZE);
     if (image.width > maxTexSize || image.height > maxTexSize) {
@@ -43,7 +61,7 @@ glx.texture.Image = function(src, callback) {
       GL.bindTexture(GL.TEXTURE_2D, this.id);
       GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
       GL.generateMipmap(GL.TEXTURE_2D);
-    
+
       if (GL.anisotropyExtension) {
         GL.texParameterf(
           GL.TEXTURE_2D,
@@ -53,23 +71,7 @@ glx.texture.Image = function(src, callback) {
       }
       GL.bindTexture(GL.TEXTURE_2D, null);
     }
-
-    if (callback) {
-      callback(image);
-    }
-
-  }.bind(this);
-
-  image.onerror = function() {
-    if (callback) {
-      callback();
-    }
-  };
-
-  image.src = src;
-};
-
-glx.texture.Image.prototype = {
+  },
 
   enable: function(index) {
     if (!this.id) {

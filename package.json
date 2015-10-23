@@ -2,7 +2,7 @@
   "name": "GLX",
   "private": false,
   "description": "A WebGL base framework.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "@kekscom",
   "contributors": [],
   "maintainers": [],
