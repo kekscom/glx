@@ -27,8 +27,8 @@ glx.texture.Data = function(width, height, data, options) {
 glx.texture.Data.prototype = {
 
   enable: function(index) {
-    GL.bindTexture(GL.TEXTURE_2D, this.id);
     GL.activeTexture(GL.TEXTURE0 + (index || 0));
+    GL.bindTexture(GL.TEXTURE_2D, this.id);
   },
 
   destroy: function() {

@@ -33,52 +33,58 @@ glx.texture.Image = function(src, callback) {
 
 glx.texture.Image.prototype = {
 
-  onLoad: function(image) {
-    // TODO: do this only once
-    var maxTexSize = GL.getParameter(GL.MAX_TEXTURE_SIZE);
-    if (image.width > maxTexSize || image.height > maxTexSize) {
-      var w = maxTexSize, h = maxTexSize;
-      var ratio = image.width/image.height;
-      // TODO: if other dimension doesn't fit to POT after resize, there is still trouble
-      if (ratio < 1) {
-        w = Math.round(h*ratio);
-      } else {
-        h = Math.round(w/ratio);
-      }
-
-      var canvas = document.createElement('CANVAS');
-      canvas.width  = w;
-      canvas.height = h;
-
-      var context = canvas.getContext('2d');
-      context.drawImage(image, 0, 0, canvas.width, canvas.height);
-      image = canvas;
+  clamp: function(image, maxSize) {
+    if (image.width <= maxSize && image.height <= maxSize) {
+//    return image;
+      return; // image;
     }
+
+    var w = maxSize, h = maxSize;
+    var ratio = image.width/image.height;
+    // TODO: if other dimension doesn't fit to POT after resize, there is still trouble
+    if (ratio < 1) {
+      w = Math.round(h*ratio);
+    } else {
+      h = Math.round(w/ratio);
+    }
+
+    var canvas = document.createElement('CANVAS');
+    canvas.width  = w;
+    canvas.height = h;
+
+    var context = canvas.getContext('2d');
+    context.drawImage(image, 0, 0, canvas.width, canvas.height);
+image = canvas;
+    //return canvas;
+  },
+
+  onLoad: function(image) {
+//    this.clamp(image, GL.getParameter(GL.MAX_TEXTURE_SIZE));
+    this.clamp(image, 128);
 
     if (!this.id) {
+      // texture has been destroyed
       image = null;
-    } else {
-      GL.bindTexture(GL.TEXTURE_2D, this.id);
-      GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
-      GL.generateMipmap(GL.TEXTURE_2D);
-
-      if (GL.anisotropyExtension) {
-        GL.texParameterf(
-          GL.TEXTURE_2D,
-          GL.anisotropyExtension.TEXTURE_MAX_ANISOTROPY_EXT,
-          GL.anisotropyExtension.maxAnisotropyLevel
-        );
-      }
-      GL.bindTexture(GL.TEXTURE_2D, null);
+      return;
     }
+
+    GL.bindTexture(GL.TEXTURE_2D, this.id);
+    GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
+    GL.generateMipmap(GL.TEXTURE_2D);
+
+    if (GL.anisotropyExtension) {
+      GL.texParameterf(GL.TEXTURE_2D, GL.anisotropyExtension.TEXTURE_MAX_ANISOTROPY_EXT, GL.anisotropyExtension.maxAnisotropyLevel);
+    }
+
+    GL.bindTexture(GL.TEXTURE_2D, null);
   },
 
   enable: function(index) {
     if (!this.id) {
       return;
     }
-    GL.bindTexture(GL.TEXTURE_2D, this.id);
     GL.activeTexture(GL.TEXTURE0 + (index || 0));
+    GL.bindTexture(GL.TEXTURE_2D, this.id);
   },
 
   destroy: function() {
