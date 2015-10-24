@@ -51,6 +51,7 @@ glx.texture.Image.prototype = {
       }
     };
     image.src = url;
+    return this;
   },
 
   color: function(color) {
@@ -59,6 +60,7 @@ glx.texture.Image.prototype = {
     GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
     GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([color[0]*255, color[1]*255, color[2]*255, (color[3] === undefined ? 1 : color[3])*255]));
     GL.bindTexture(GL.TEXTURE_2D, null);
+    return this;
   },
 
   set: function(image) {
@@ -81,6 +83,7 @@ glx.texture.Image.prototype = {
     }
 
     GL.bindTexture(GL.TEXTURE_2D, null);
+    return this;
   },
 
   enable: function(index) {
@@ -89,6 +92,7 @@ glx.texture.Image.prototype = {
     }
     GL.activeTexture(GL.TEXTURE0 + (index || 0));
     GL.bindTexture(GL.TEXTURE_2D, this.id);
+    return this;
   },
 
   destroy: function() {
