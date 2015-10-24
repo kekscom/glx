@@ -1,37 +1,14 @@
 
-glx.texture.Image = function(src, callback) {
+glx.texture.Image = function() {
   this.id = GL.createTexture();
   GL.bindTexture(GL.TEXTURE_2D, this.id);
 
-  GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
-  GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+  GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, true);
+
 //GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
 //GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
-  GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, true);
-
-  GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8ClampedArray(128*128*4));
-
   GL.bindTexture(GL.TEXTURE_2D, null);
-
-  if (typeof src !== 'string') {
-    this.onLoad(src);
-  } else {
-    var image = new Image();
-    image.crossOrigin = '*';
-    image.onload = function() {
-      this.onLoad(image);
-      if (callback) {
-        callback(image);
-      }
-    }.bind(this);
-    image.onerror = function() {
-      if (callback) {
-        callback();
-      }
-    };
-    image.src = src;
-  }
 };
 
 glx.texture.Image.prototype = {
@@ -59,18 +36,44 @@ glx.texture.Image.prototype = {
     return canvas;
   },
 
-  onLoad: function(image) {
-    image = this.clamp(image, GL.getParameter(GL.MAX_TEXTURE_SIZE));
+  load: function(url, callback) {
+    var image = new Image();
+    image.crossOrigin = '*';
+    image.onload = function() {
+      this.set(image);
+      if (callback) {
+        callback(image);
+      }
+    }.bind(this);
+    image.onerror = function() {
+      if (callback) {
+        callback();
+      }
+    };
+    image.src = url;
+  },
 
+  color: function(color) {
+    GL.bindTexture(GL.TEXTURE_2D, this.id);
+    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
+    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+    GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, 1, 1, 0, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8Array([color[0]*255, color[1]*255, color[2]*255, (color[3] === undefined ? 1 : color[3])*255]));
+    GL.bindTexture(GL.TEXTURE_2D, null);
+  },
+
+  set: function(image) {
     if (!this.id) {
       // texture has been destroyed
-      image = null;
       return;
     }
 
+    image = this.clamp(image, GL.getParameter(GL.MAX_TEXTURE_SIZE));
+
     GL.bindTexture(GL.TEXTURE_2D, this.id);
-    GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
     GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
+
+    GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
     GL.generateMipmap(GL.TEXTURE_2D);
 
     if (GL.anisotropyExtension) {
