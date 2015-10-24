@@ -590,12 +590,15 @@ glx.texture.Image = function(src, callback) {
   this.id = GL.createTexture();
   GL.bindTexture(GL.TEXTURE_2D, this.id);
 
-  GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
+  GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR);
   GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MAG_FILTER, GL.LINEAR);
 //GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_S, GL.CLAMP_TO_EDGE);
 //GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_WRAP_T, GL.CLAMP_TO_EDGE);
 
   GL.pixelStorei(GL.UNPACK_FLIP_Y_WEBGL, true);
+
+  GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, new Uint8ClampedArray(128*128*4));
+
   GL.bindTexture(GL.TEXTURE_2D, null);
 
   if (typeof src !== 'string') {
@@ -622,8 +625,7 @@ glx.texture.Image.prototype = {
 
   clamp: function(image, maxSize) {
     if (image.width <= maxSize && image.height <= maxSize) {
-//    return image;
-      return; // image;
+      return image;
     }
 
     var w = maxSize, h = maxSize;
@@ -641,13 +643,11 @@ glx.texture.Image.prototype = {
 
     var context = canvas.getContext('2d');
     context.drawImage(image, 0, 0, canvas.width, canvas.height);
-image = canvas;
-    //return canvas;
+    return canvas;
   },
 
   onLoad: function(image) {
-//    this.clamp(image, GL.getParameter(GL.MAX_TEXTURE_SIZE));
-    this.clamp(image, 128);
+    image = this.clamp(image, GL.getParameter(GL.MAX_TEXTURE_SIZE));
 
     if (!this.id) {
       // texture has been destroyed
@@ -657,6 +657,7 @@ image = canvas;
 
     GL.bindTexture(GL.TEXTURE_2D, this.id);
     GL.texImage2D(GL.TEXTURE_2D, 0, GL.RGBA, GL.RGBA, GL.UNSIGNED_BYTE, image);
+    GL.texParameteri(GL.TEXTURE_2D, GL.TEXTURE_MIN_FILTER, GL.LINEAR_MIPMAP_NEAREST);
     GL.generateMipmap(GL.TEXTURE_2D);
 
     if (GL.anisotropyExtension) {
