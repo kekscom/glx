@@ -576,7 +576,14 @@ glx.Matrix = function(data) {
 }());
 
 
-glx.texture = {};
+glx.texture = {
+
+  disableAll: function() {
+    GL.activeTexture(GL.TEXTURE0);
+    GL.bindTexture(GL.TEXTURE_2D, null);
+  }
+
+};
 
 
 glx.texture.Image = function(src, callback) {
@@ -661,12 +668,8 @@ glx.texture.Image.prototype = {
     GL.activeTexture(GL.TEXTURE0 + (index || 0));
   },
 
-  disable: function() {
-    GL.bindTexture(GL.TEXTURE_2D, null);
-  },
-
   destroy: function() {
-    this.disable();
+    GL.bindTexture(GL.TEXTURE_2D, null);
     GL.deleteTexture(this.id);
     this.id = null;
   }
@@ -703,10 +706,6 @@ glx.texture.Data.prototype = {
   enable: function(index) {
     GL.bindTexture(GL.TEXTURE_2D, this.id);
     GL.activeTexture(GL.TEXTURE0 + (index || 0));
-  },
-
-  disable: function() {
-    GL.bindTexture(GL.TEXTURE_2D, null);
   },
 
   destroy: function() {

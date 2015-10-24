@@ -31,10 +31,6 @@ glx.texture.Data.prototype = {
     GL.activeTexture(GL.TEXTURE0 + (index || 0));
   },
 
-  disable: function() {
-    GL.bindTexture(GL.TEXTURE_2D, null);
-  },
-
   destroy: function() {
     GL.bindTexture(GL.TEXTURE_2D, null);
     GL.deleteTexture(this.id);
