@@ -19,5 +19,4 @@ GLX.use = function(context) {
     glx.destroy = function() {
       context.canvas.parentNode.removeChild(context.canvas);
       context = null;
-      context.canvas = null;
     };
