@@ -71,9 +71,10 @@ GLX.use = function(context) {
       clearInterval(loop);
     };
 
-    glx.destroy = function(GL) {
-      GL.canvas.parentNode.removeChild(GL.canvas);
-      GL.canvas = null;
+    glx.destroy = function() {
+      context.canvas.parentNode.removeChild(context.canvas);
+      context = null;
+      context.canvas = null;
     };
 
 
